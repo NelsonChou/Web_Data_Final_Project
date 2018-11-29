@@ -8,6 +8,43 @@ from bs4 import BeautifulSoup
 import os
 os.chdir('D:\\Master Program\\03. Begin\\Course\\09. Web Data Analytics\\Project')
 
+
+from bs4 import BeautifulSoup as bs
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+chrome_options = Options()
+chrome_options.add_argument('--headless')
+chrome_options.add_argument('--no-sandbox')
+chrome_options.add_argument('--disable-dev-shm-usage')
+# chromedriver's path must be absolute path in Mac, this is the syntax
+driver = webdriver.Chrome('/Users/lotto/Documents/WebData/HW/chromedriver', options = chrome_options)
+
+#Part 0：Scraping all the Mexican restaurant links in Seattle, WA. Save it in to a list.
+RestLinks = []
+
+page = 0 # set the first page
+last_page = False 
+
+while last_page == False:
+
+    driver = webdriver.Chrome('/Users/lotto/Documents/WebData/HW/chromedriver', options = chrome_options) 
+    driver.get('https://www.yelp.com/search?find_desc=Mexican&find_loc=Seattle,+WA&start=' + str(page*30)) # the format of the url
+    assert 'Yelp' in driver.title # Wait for the page to load
+    html = driver.page_source # Get the html of the page
+    driver.quit() # Close the browser
+
+    soup = bs(html, 'html.parser')
+
+    for quote in soup.find_all('div', class_='quote'):
+        Quote.append(quote.find('span', class_='text').getText()[1:-1]) # get the quotes, get rid of the quote marks.
+
+
+    if soup.find_all('li', class_='next') == []: # see if there is a 'next' button
+        last_page = True # if not, then it is the last page, the loop stops.
+    else:
+        page += 1 # otherwise, go to next page.
+
+
 #Part 1: Scraping all Yelp review for Mexican restaurants in Seattle
 url='https://www.yelp.com/search?cflt=mexican&find_loc=Seattle' #Yelp Seattle Mexican restaurant 1st page
 url_yelp='https://www.yelp.com'
