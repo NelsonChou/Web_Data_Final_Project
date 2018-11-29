@@ -63,8 +63,36 @@ restaurant_page_link=url_yelp+sub_link
 
 html_restaurant=urllib.request.urlopen(restaurant_page_link).read().decode('utf-8')
 soup_restaurant=bs.BeautifulSoup(html_restaurant)
-restaurant_name=soup_restaurant.find_all('h1', class_='biz-page-title')[0].getText()
-restaurant_name=restaurant_name.replace('\n','')
-restaurant_name=restaurant_name.strip()
 
-soup_restaurant.find_all('address')
+#get restaurant name
+restaurant_name=soup_restaurant.find_all('h1', class_='biz-page-title')[0].getText()
+restaurant_name=restaurant_name.replace('\n','').strip()
+
+#get address
+address=soup_restaurant.find_all('address')[1].getText()
+address=address.replace('\n','').strip()
+
+#get review count
+review_count=soup_restaurant.find_all('span', class_='review-count rating-qualifier')[0].getText()
+review_count=review_count.replace('\n','').strip().split(' ')[0]
+
+#get price range and calculate average spent
+price_range=soup_restaurant.find_all('dd', class_='nowrap price-description')[0].getText()
+price_range=price_range.replace('\n','').strip()
+price_range=(int(price_range[1:].split('-')[0])+int(price_range[1:].split('-')[1]))/2 #take mean value
+
+#get business info
+business_info=soup_restaurant.find_all('dt', class_='attribute-key')[2:]
+business_info_all=[]
+
+for i in range(len(business_info)):
+    business_info_clean=business_info[i].getText()
+    business_info_clean=business_info_clean.replace('\n','').strip()
+    business_info_all.append(business_info_clean)
+
+#get yes, no, casual for business info- not done yet
+yes_no=soup_restaurant.find_all('dt', class_='attribute-key')
+yes_no[2].findChildren("dd" , recursive=False)
+
+#get reviewer's name
+reviewer_list=[]
