@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 import os
 os.chdir('D:\\Master Program\\03. Begin\\Course\\09. Web Data Analytics\\Project')
 
-
+#part 1: scrap all restaurant link: Lotto
 from bs4 import BeautifulSoup as bs
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -45,7 +45,7 @@ while last_page == False:
         page += 1 # otherwise, go to next page.
 
 
-#Part 1: Scraping all Yelp review for Mexican restaurants in Seattle
+#part 2: scrap restaurant details
 url='https://www.yelp.com/search?cflt=mexican&find_loc=Seattle' #Yelp Seattle Mexican restaurant 1st page
 url_yelp='https://www.yelp.com'
 
@@ -72,7 +72,7 @@ restaurant_name=restaurant_name.replace('\n','').strip()
 address=soup_restaurant.find_all('address')[1].getText()
 address=address.replace('\n','').strip()
 
-#get review count
+#get review count: maybe useless once we break down
 review_count=soup_restaurant.find_all('span', class_='review-count rating-qualifier')[0].getText()
 review_count=review_count.replace('\n','').strip().split(' ')[0]
 
@@ -81,7 +81,7 @@ price_range=soup_restaurant.find_all('dd', class_='nowrap price-description')[0]
 price_range=price_range.replace('\n','').strip()
 price_range=(int(price_range[1:].split('-')[0])+int(price_range[1:].split('-')[1]))/2 #take mean value
 
-#get business info
+#get business info: only need to get once from the main page
 business_info=soup_restaurant.find_all('dt', class_='attribute-key')[2:]
 business_info_all=[]
 
@@ -89,10 +89,6 @@ for i in range(len(business_info)):
     business_info_clean=business_info[i].getText()
     business_info_clean=business_info_clean.replace('\n','').strip()
     business_info_all.append(business_info_clean)
-
-#get yes, no, casual for business info- not done yet
-yes_no=soup_restaurant.find_all('dt', class_='attribute-key')
-yes_no[2].findChildren("dd" , recursive=False)
 
 #get reviewer's name
 reviewer_list=[]
@@ -103,9 +99,30 @@ for i in range(len(reviewer)):
     reviewer_list.append(reviewer[i].get_text().replace('\n',''))
 
 #get review content
-    
 reviews_list=[]
 reviews=soup_restaurant.find_all('p', lang='en')
 
 for i in range(len(reviews)):
-    reviews_list.append(reviews[i].get_text())
+    reviews_list.append(reviews[i].get_text())    
+   
+################
+#To be continued
+################
+
+#Date of review: Nelson
+
+
+#review city: Nelson 
+
+#get yes, no, casual for business info- not done yet: Nelson
+yes_no=soup_restaurant.find_all('dt', class_='attribute-key')
+yes_no[2].findChildren("dd" , recursive=False)
+
+#review rating on user level (the stars): Chaitali
+
+
+#Elite user info: Chaitali
+
+
+
+#Need to travel through all the pages for all above basically
