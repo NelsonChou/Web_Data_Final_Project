@@ -96,3 +96,16 @@ yes_no[2].findChildren("dd" , recursive=False)
 
 #get reviewer's name
 reviewer_list=[]
+
+reviewer=soup_restaurant.find_all('li', class_='user-name')
+
+for i in range(len(reviewer)):
+    reviewer_list.append(reviewer[i].get_text().replace('\n',''))
+
+#get review content
+    
+reviews_list=[]
+reviews=soup_restaurant.find_all('p', lang='en')
+
+for i in range(len(reviews)):
+    reviews_list.append(reviews[i].get_text())
