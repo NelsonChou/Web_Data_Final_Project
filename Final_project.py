@@ -116,6 +116,8 @@ while html_restaurant[index_final:].find('<dt class="attribute-key">')!=-1:
 ###Reviewer's part
 ##################
 
+
+
 current_page=int(soup_restaurant.find_all('div', class_='page-of-pages arrange_unit arrange_unit--fill')[0].getText().strip().split(' ')[1])
 total_page=int(soup_restaurant.find_all('div', class_='page-of-pages arrange_unit arrange_unit--fill')[0].getText().strip().split(' ')[3])
 
@@ -160,13 +162,22 @@ while current_page<=total_page:
         index_final+=index3
     
     #review rating on user level (the stars): Chaitali
+    index_final=0
     
+    while html_restaurant[index_final:].find('<div class="biz-rating biz-rating-large clearfix">')!=-1:
+        index1=html_restaurant[index_final:].find('<div class="biz-rating biz-rating-large clearfix">')
+        index_final+=index1
+        index2=html_restaurant[index_final:].find('title')
+        index_final+=index2
+        index3=html_restaurant[index_final:].find('star rating')
+        reviewer_rating_list.append(html_restaurant[index_final:][7:index3])
+        index_final+=index3
     
     #Elite user info: Chaitali
 
 
 
-    #find next page: to be tested
+    #find next page
     restaurant_page_link=url_yelp+sub_link+'?start='+str(page_num)
     
     html_restaurant=urllib.request.urlopen(restaurant_page_link).read().decode('utf-8')
@@ -174,5 +185,3 @@ while current_page<=total_page:
     
     current_page=int(soup_restaurant.find_all('div', class_='page-of-pages arrange_unit arrange_unit--fill')[0].getText().strip().split(' ')[1])
     total_page=int(soup_restaurant.find_all('div', class_='page-of-pages arrange_unit arrange_unit--fill')[0].getText().strip().split(' ')[3])
- 
-
