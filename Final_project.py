@@ -211,8 +211,16 @@ while current_page<=total_page: #if current page is smaller or equal to total pa
         index_final+=index3
     
     #Elite user info: Chaitali
+    index_final=0
 
-
+    while html_restaurant[index_final:].find('<li class="is-elite responsive-small-display-inline-block">')!=-1:                
+        index1=html_restaurant[index_final:].find('<li class="is-elite responsive-small-display-inline-block">')
+        index_final+=index1
+        index2=html_restaurant[index_final:].find('<a href="/elite">')
+        index_final+=index2
+        index3=html_restaurant[index_final:].find('</a>')
+        reviewer_elite_list.append(html_restaurant[index_final:][17:index3])
+        index_final+=index3
 
     #find next page
     restaurant_page_link=url_yelp+sub_link+'?start='+str(page_num)
