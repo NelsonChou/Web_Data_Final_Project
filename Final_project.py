@@ -71,6 +71,10 @@ restaurant_page_link=url_yelp+sub_link
 html_restaurant=urllib.request.urlopen(restaurant_page_link).read().decode('utf-8')
 soup_restaurant=bs.BeautifulSoup(html_restaurant)
 
+####################
+###Restaurant's part
+####################
+
 #get restaurant name
 restaurant_name=soup_restaurant.find_all('h1', class_='biz-page-title')[0].getText()
 restaurant_name=restaurant_name.replace('\n','').strip()
@@ -97,6 +101,21 @@ for i in range(len(business_info)):
     business_info_clean=business_info_clean.replace('\n','').strip()
     business_info_all.append(business_info_clean)
 
+#get yes, no, casual for business info- not done yet: Nelson
+index_final=html_restaurant.find('<h3>More business info</h3>')
+
+while html_restaurant[index_final:].find('<dt class="attribute-key">')!=-1:
+    index1=html_restaurant[index_final:].find('<dt class="attribute-key">')
+    index_final+=index1
+    index2=html_restaurant[index_final:].find('<dd>')
+    index_final+=index2
+    index3=html_restaurant[index_final:][5:].find('\n')
+    business_info_yesno_list.append(html_restaurant[index_final+5:][:index3].strip())
+
+##################
+###Reviewer's part
+##################
+
 #get reviewer's name
 reviewer=soup_restaurant.find_all('li', class_='user-name')
 
@@ -109,10 +128,6 @@ reviews=soup_restaurant.find_all('p', lang='en')
 for i in range(len(reviews)):
     reviews_list.append(reviews[i].get_text())    
    
-################
-#To be continued
-################
-
 #Date of review: Nelson
 index_final=0
 
@@ -135,17 +150,6 @@ while html_restaurant[index_final:].find('<li class="user-location responsive-hi
     index3=html_restaurant[index_final:].find('</b>')
     reviewer_city_list.append(html_restaurant[index_final:][3:index3])
     index_final+=index3
-
-#get yes, no, casual for business info- not done yet: Nelson
-index_final=html_restaurant.find('<h3>More business info</h3>')
-
-while html_restaurant[index_final:].find('<dt class="attribute-key">')!=-1:
-    index1=html_restaurant[index_final:].find('<dt class="attribute-key">')
-    index_final+=index1
-    index2=html_restaurant[index_final:].find('<dd>')
-    index_final+=index2
-    index3=html_restaurant[index_final:][5:].find('\n')
-    business_info_yesno_list.append(html_restaurant[index_final+5:][:index3].strip())
 
 #review rating on user level (the stars): Chaitali
 
