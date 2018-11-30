@@ -112,18 +112,21 @@ while html_restaurant[index_final:].find('<dt class="attribute-key">')!=-1:
     index3=html_restaurant[index_final:][5:].find('\n')
     business_info_yesno_list.append(html_restaurant[index_final+5:][:index3].strip())
 
+for i in range(len(business_info_yesno_list)):
+    df_restaurant_info=df_restaurant_info.append({'Restaurant name':restaurant_name, 'Address':address, 'Business info':business_info_all[i],
+                                  'Yes/No':business_info_yesno_list[i], 'Review counts':review_count, 'Price range':price_range}, ignore_index=True)
+
 ##################
 ###Reviewer's part
 ##################
 
-
-
+#set starting point: if current page number is smaller than total page number, keep going to next page
 current_page=int(soup_restaurant.find_all('div', class_='page-of-pages arrange_unit arrange_unit--fill')[0].getText().strip().split(' ')[1])
 total_page=int(soup_restaurant.find_all('div', class_='page-of-pages arrange_unit arrange_unit--fill')[0].getText().strip().split(' ')[3])
 
 page_num=0
 
-while current_page<=total_page:
+while current_page<=total_page: #if current page is smaller or equal to total page, scrap the page
     page_num+=20
     
     #get reviewer's name
@@ -185,3 +188,4 @@ while current_page<=total_page:
     
     current_page=int(soup_restaurant.find_all('div', class_='page-of-pages arrange_unit arrange_unit--fill')[0].getText().strip().split(' ')[1])
     total_page=int(soup_restaurant.find_all('div', class_='page-of-pages arrange_unit arrange_unit--fill')[0].getText().strip().split(' ')[3])
+ 
