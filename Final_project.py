@@ -112,6 +112,7 @@ while html_restaurant[index_final:].find('<dt class="attribute-key">')!=-1:
     index3=html_restaurant[index_final:][5:].find('\n')
     business_info_yesno_list.append(html_restaurant[index_final+5:][:index3].strip())
 
+#write result to restaurant info dataframe
 for i in range(len(business_info_yesno_list)):
     df_restaurant_info=df_restaurant_info.append({'Restaurant name':restaurant_name, 'Address':address, 'Business info':business_info_all[i],
                                   'Yes/No':business_info_yesno_list[i], 'Review counts':review_count, 'Price range':price_range}, ignore_index=True)
