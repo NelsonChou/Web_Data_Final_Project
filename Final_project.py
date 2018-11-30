@@ -8,6 +8,13 @@ from bs4 import BeautifulSoup
 import os
 os.chdir('D:\\Master Program\\03. Begin\\Course\\09. Web Data Analytics\\Project')
 
+#variables
+reviewer_city_list=[]
+reviewer_list=[]
+reviews_list=[]
+reviews_date_list=[]
+business_info_yesno_list=[]
+
 #part 1: scrap all restaurant link: Lotto
 from bs4 import BeautifulSoup as bs
 from selenium import webdriver
@@ -91,15 +98,12 @@ for i in range(len(business_info)):
     business_info_all.append(business_info_clean)
 
 #get reviewer's name
-reviewer_list=[]
-
 reviewer=soup_restaurant.find_all('li', class_='user-name')
 
 for i in range(len(reviewer)):
     reviewer_list.append(reviewer[i].get_text().replace('\n',''))
 
 #get review content
-reviews_list=[]
 reviews=soup_restaurant.find_all('p', lang='en')
 
 for i in range(len(reviews)):
@@ -110,13 +114,38 @@ for i in range(len(reviews)):
 ################
 
 #Date of review: Nelson
+index_final=0
 
+while html_restaurant[index_final:].find('<span class="rating-qualifier">')!=-1:
+    index1=html_restaurant[index_final:].find('<span class="rating-qualifier">')
+    index_final+=index1
+    index2=html_restaurant[index_final:].find('\n')
+    index_final+=index2
+    index3=html_restaurant[index_final:][1:].find('\n')
+    reviews_date_list.append(html_restaurant[index_final:][:index3+1].split(' ')[-1])
 
 #review city: Nelson 
+index_final=0
+
+while html_restaurant[index_final:].find('<li class="user-location responsive-hidden-small">')!=-1:
+    index1=html_restaurant[index_final:].find('<li class="user-location responsive-hidden-small">')
+    index_final+=index1
+    index2=html_restaurant[index_final:].find('<b>')
+    index_final+=index2
+    index3=html_restaurant[index_final:].find('</b>')
+    reviewer_city_list.append(html_restaurant[index_final:][3:index3])
+    index_final+=index3
 
 #get yes, no, casual for business info- not done yet: Nelson
-yes_no=soup_restaurant.find_all('dt', class_='attribute-key')
-yes_no[2].findChildren("dd" , recursive=False)
+index_final=html_restaurant.find('<h3>More business info</h3>')
+
+while html_restaurant[index_final:].find('<dt class="attribute-key">')!=-1:
+    index1=html_restaurant[index_final:].find('<dt class="attribute-key">')
+    index_final+=index1
+    index2=html_restaurant[index_final:].find('<dd>')
+    index_final+=index2
+    index3=html_restaurant[index_final:][5:].find('\n')
+    business_info_yesno_list.append(html_restaurant[index_final+5:][:index3].strip())
 
 #review rating on user level (the stars): Chaitali
 
