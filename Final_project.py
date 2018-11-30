@@ -1,5 +1,4 @@
 #Web Data Analytics- Final Project
-
 import pandas as pd
 import urllib
 import bs4 as bs
@@ -10,17 +9,23 @@ import random
 import time
 from urllib.request import FancyURLopener  # This is library that helps us create the headless browser
 from random import choice #This library helps pick a random item from a list
+import warnings
+warnings.filterwarnings("ignore")
+import os
+os.chdir('D:\\Master Program\\03. Begin\\Course\\09. Web Data Analytics\\Project')
+
+#########################################
+#part 0: public variables, class, agent
+#########################################
 
 #variables
-reviewer_city_list=[]
-reviewer_list=[]
-reviews_list=[]
-reviews_date_list=[]
-business_info_yesno_list=[]
 col_restaurant_info=['Restaurant name','Address','Business info','Yes/No','Review counts','Price range']
 df_restaurant_info=pd.DataFrame(columns=col_restaurant_info)
 
-#part 1: scrap all restaurant link: Lotto
+col_reviews=['Reviewer', 'Elite','Reviews', 'Date of review','Reviewer City', 'Review Rating']
+df_reviews_info=pd.DataFrame(columns=col_reviews)
+
+#agent
 user_agents = [
     'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36',
     'Opera/9.80 (X11; Linux i686; Ubuntu/14.10) Presto/2.12.388 Version/12.16',
@@ -28,6 +33,16 @@ user_agents = [
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/7046A194A',
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246'
 ]
+
+#class
+class MyOpener(FancyURLopener, object):
+    version = choice(user_agents)
+
+myopener = MyOpener()
+
+#########################################
+#part 1: scrap all restaurant link: Lotto
+#########################################
 
 # These are the usr agents for each of different browsers. Here we are using five, but it can be any number of user agents
 RestNames = []
@@ -37,10 +52,7 @@ p = 0 # set the first page
 last_page = False 
 
 while last_page == False:
-    class MyOpener(FancyURLopener, object):
-        version = choice(user_agents)
 
-    myopener = MyOpener()
     page=myopener.open('https://www.yelp.com/search?find_desc=Mexican&find_loc=Seattle,+WA&start=' + str(p*30))
     html = page.read().decode('utf-8')
 
@@ -58,9 +70,9 @@ while last_page == False:
     sleep=random.randint(2,7)
     time.sleep(sleep)
 
-
-
+#################################
 #part 2: scrap restaurant details
+#################################
 url='https://www.yelp.com/search?cflt=mexican&find_loc=Seattle' #Yelp Seattle Mexican restaurant 1st page
 url_yelp='https://www.yelp.com'
 
@@ -76,7 +88,7 @@ soup=soup[5:] #restaurant information begins from 6 elements onward
 sub_link=soup[0].attrs['href'] #sublink of the first restaurant
 restaurant_page_link=url_yelp+sub_link+'?start='+str(0)
 
-html_restaurant=urllib.request.urlopen(restaurant_page_link).read().decode('utf-8')
+html_restaurant=myopener.open(restaurant_page_link).read().decode('utf-8')
 soup_restaurant=bs.BeautifulSoup(html_restaurant)
 
 ####################
@@ -111,6 +123,7 @@ for i in range(len(business_info)):
 
 #get yes, no, casual for business info- not done yet: Nelson
 index_final=html_restaurant.find('<h3>More business info</h3>')
+business_info_yesno_list=[]
 
 while html_restaurant[index_final:].find('<dt class="attribute-key">')!=-1:
     index1=html_restaurant[index_final:].find('<dt class="attribute-key">')
@@ -122,13 +135,24 @@ while html_restaurant[index_final:].find('<dt class="attribute-key">')!=-1:
 
 #write result to restaurant info dataframe
 for i in range(len(business_info_yesno_list)):
-    df_restaurant_info=df_restaurant_info.append({'Restaurant name':restaurant_name, 'Address':address, 'Business info':business_info_all[i],
-                                  'Yes/No':business_info_yesno_list[i], 'Review counts':review_count, 'Price range':price_range}, ignore_index=True)
+    df_restaurant_info=df_restaurant_info.append({'Restaurant name':restaurant_name, 
+                                                  'Address':address, 
+                                                  'Business info':business_info_all[i],
+                                                  'Yes/No':business_info_yesno_list[i], 
+                                                  'Review counts':review_count, 
+                                                  'Price range':price_range}, ignore_index=True)
 
 ##################
 ###Reviewer's part
 ##################
 
+reviewer_city_list=[]
+reviewer_list=[]
+reviews_list=[]
+reviews_date_list=[]
+reviewer_rating_list=[]
+current_page_list=[]    
+    
 #set starting point: if current page number is smaller than total page number, keep going to next page
 current_page=int(soup_restaurant.find_all('div', class_='page-of-pages arrange_unit arrange_unit--fill')[0].getText().strip().split(' ')[1])
 total_page=int(soup_restaurant.find_all('div', class_='page-of-pages arrange_unit arrange_unit--fill')[0].getText().strip().split(' ')[3])
@@ -136,6 +160,7 @@ total_page=int(soup_restaurant.find_all('div', class_='page-of-pages arrange_uni
 page_num=0
 
 while current_page<=total_page: #if current page is smaller or equal to total page, scrap the page
+    current_page_list.append(current_page)
     page_num+=20
     
     #get reviewer's name
@@ -192,8 +217,11 @@ while current_page<=total_page: #if current page is smaller or equal to total pa
     #find next page
     restaurant_page_link=url_yelp+sub_link+'?start='+str(page_num)
     
-    html_restaurant=urllib.request.urlopen(restaurant_page_link).read().decode('utf-8')
+    html_restaurant=myopener.open(restaurant_page_link).read().decode('utf-8')
     soup_restaurant=bs.BeautifulSoup(html_restaurant)
+    
+    sleep=random.randint(2,7)
+    time.sleep(sleep)
     
     current_page=int(soup_restaurant.find_all('div', class_='page-of-pages arrange_unit arrange_unit--fill')[0].getText().strip().split(' ')[1])
     total_page=int(soup_restaurant.find_all('div', class_='page-of-pages arrange_unit arrange_unit--fill')[0].getText().strip().split(' ')[3])
