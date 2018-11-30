@@ -66,7 +66,7 @@ soup=soup[5:] #restaurant information begins from 6 elements onward
 #for i in 
 
 sub_link=soup[0].attrs['href'] #sublink of the first restaurant
-restaurant_page_link=url_yelp+sub_link
+restaurant_page_link=url_yelp+sub_link+'?start='+str(0)
 
 html_restaurant=urllib.request.urlopen(restaurant_page_link).read().decode('utf-8')
 soup_restaurant=bs.BeautifulSoup(html_restaurant)
@@ -116,46 +116,63 @@ while html_restaurant[index_final:].find('<dt class="attribute-key">')!=-1:
 ###Reviewer's part
 ##################
 
-#get reviewer's name
-reviewer=soup_restaurant.find_all('li', class_='user-name')
+current_page=int(soup_restaurant.find_all('div', class_='page-of-pages arrange_unit arrange_unit--fill')[0].getText().strip().split(' ')[1])
+total_page=int(soup_restaurant.find_all('div', class_='page-of-pages arrange_unit arrange_unit--fill')[0].getText().strip().split(' ')[3])
 
-for i in range(len(reviewer)):
-    reviewer_list.append(reviewer[i].get_text().replace('\n',''))
+page_num=0
 
-#get review content
-reviews=soup_restaurant.find_all('p', lang='en')
+while current_page<=total_page:
+    page_num+=20
+    
+    #get reviewer's name
+    reviewer=soup_restaurant.find_all('li', class_='user-name')
+    
+    for i in range(len(reviewer)):
+        reviewer_list.append(reviewer[i].get_text().replace('\n',''))
+    
+    #get review content
+    reviews=soup_restaurant.find_all('p', lang='en')
+    
+    for i in range(len(reviews)):
+        reviews_list.append(reviews[i].get_text())    
+       
+    #Date of review: Nelson
+    index_final=0
+    
+    while html_restaurant[index_final:].find('<span class="rating-qualifier">')!=-1:
+        index1=html_restaurant[index_final:].find('<span class="rating-qualifier">')
+        index_final+=index1
+        index2=html_restaurant[index_final:].find('\n')
+        index_final+=index2
+        index3=html_restaurant[index_final:][1:].find('\n')
+        reviews_date_list.append(html_restaurant[index_final:][:index3+1].split(' ')[-1])
+    
+    #review city: Nelson 
+    index_final=0
+    
+    while html_restaurant[index_final:].find('<li class="user-location responsive-hidden-small">')!=-1:
+        index1=html_restaurant[index_final:].find('<li class="user-location responsive-hidden-small">')
+        index_final+=index1
+        index2=html_restaurant[index_final:].find('<b>')
+        index_final+=index2
+        index3=html_restaurant[index_final:].find('</b>')
+        reviewer_city_list.append(html_restaurant[index_final:][3:index3])
+        index_final+=index3
+    
+    #review rating on user level (the stars): Chaitali
+    
+    
+    #Elite user info: Chaitali
 
-for i in range(len(reviews)):
-    reviews_list.append(reviews[i].get_text())    
-   
-#Date of review: Nelson
-index_final=0
-
-while html_restaurant[index_final:].find('<span class="rating-qualifier">')!=-1:
-    index1=html_restaurant[index_final:].find('<span class="rating-qualifier">')
-    index_final+=index1
-    index2=html_restaurant[index_final:].find('\n')
-    index_final+=index2
-    index3=html_restaurant[index_final:][1:].find('\n')
-    reviews_date_list.append(html_restaurant[index_final:][:index3+1].split(' ')[-1])
-
-#review city: Nelson 
-index_final=0
-
-while html_restaurant[index_final:].find('<li class="user-location responsive-hidden-small">')!=-1:
-    index1=html_restaurant[index_final:].find('<li class="user-location responsive-hidden-small">')
-    index_final+=index1
-    index2=html_restaurant[index_final:].find('<b>')
-    index_final+=index2
-    index3=html_restaurant[index_final:].find('</b>')
-    reviewer_city_list.append(html_restaurant[index_final:][3:index3])
-    index_final+=index3
-
-#review rating on user level (the stars): Chaitali
 
 
-#Elite user info: Chaitali
+    #find next page: to be tested
+    restaurant_page_link=url_yelp+sub_link+'?start='+str(page_num)
+    
+    html_restaurant=urllib.request.urlopen(restaurant_page_link).read().decode('utf-8')
+    soup_restaurant=bs.BeautifulSoup(html_restaurant)
+    
+    current_page=int(soup_restaurant.find_all('div', class_='page-of-pages arrange_unit arrange_unit--fill')[0].getText().strip().split(' ')[1])
+    total_page=int(soup_restaurant.find_all('div', class_='page-of-pages arrange_unit arrange_unit--fill')[0].getText().strip().split(' ')[3])
+ 
 
-
-
-#Need to travel through all the pages for all above basically
