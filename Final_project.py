@@ -10,8 +10,6 @@ import random
 import time
 from urllib.request import FancyURLopener  # This is library that helps us create the headless browser
 from random import choice #This library helps pick a random item from a list
-import os
-os.chdir('D:\\Master Program\\03. Begin\\Course\\09. Web Data Analytics\\Project')
 
 #variables
 reviewer_city_list=[]
