@@ -16,40 +16,52 @@ reviews_date_list=[]
 business_info_yesno_list=[]
 
 #part 1: scrap all restaurant link: Lotto
-from bs4 import BeautifulSoup as bs
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-chrome_options = Options()
-chrome_options.add_argument('--headless')
-chrome_options.add_argument('--no-sandbox')
-chrome_options.add_argument('--disable-dev-shm-usage')
-# chromedriver's path must be absolute path in Mac, this is the syntax
-driver = webdriver.Chrome('/Users/lotto/Documents/WebData/HW/chromedriver', options = chrome_options)
+import pandas as pd
+import urllib
+import bs4 as bs
+from bs4 import SoupStrainer
+import random
+import time
+from urllib.request import FancyURLopener  # This is library that helps us create the headless browser
+from random import choice #This library helps pick a random item from a list
 
-#Part 0：Scraping all the Mexican restaurant links in Seattle, WA. Save it in to a list.
+user_agents = [
+    'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36',
+    'Opera/9.80 (X11; Linux i686; Ubuntu/14.10) Presto/2.12.388 Version/12.16',
+    'Mozilla/5.0 (Windows; U; Windows NT 6.1; rv:2.2) Gecko/20110201',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/7046A194A',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246'
+]
+
+# These are the usr agents for each of different browsers. Here we are using five, but it can be any number of user agents
+RestNames = []
 RestLinks = []
 
-page = 0 # set the first page
+p = 0 # set the first page
 last_page = False 
 
 while last_page == False:
+    class MyOpener(FancyURLopener, object):
+        version = choice(user_agents)
 
-    driver = webdriver.Chrome('/Users/lotto/Documents/WebData/HW/chromedriver', options = chrome_options) 
-    driver.get('https://www.yelp.com/search?find_desc=Mexican&find_loc=Seattle,+WA&start=' + str(page*30)) # the format of the url
-    assert 'Yelp' in driver.title # Wait for the page to load
-    html = driver.page_source # Get the html of the page
-    driver.quit() # Close the browser
+    myopener = MyOpener()
+    page=myopener.open('https://www.yelp.com/search?find_desc=Mexican&find_loc=Seattle,+WA&start=' + str(p*30))
+    html = page.read().decode('utf-8')
 
-    soup = bs(html, 'html.parser')
+    soup = bs.BeautifulSoup(html, 'html5lib')
+    for biz in soup.find_all('span', class_='indexed-biz-name'):
+        RestNames.append(biz.find('a', class_='biz-name js-analytics-click').getText())
+        RestLinks.append('https://www.yelp.com' + biz.find('a', class_='biz-name js-analytics-click').get('href')) # get the quotes, get rid of the quote marks.
 
-    for quote in soup.find_all('div', class_='quote'):
-        Quote.append(quote.find('span', class_='text').getText()[1:-1]) # get the quotes, get rid of the quote marks.
-
-
-    if soup.find_all('li', class_='next') == []: # see if there is a 'next' button
+    if soup.find_all('span', class_='pagination-label responsive-hidden-small pagination-links_anchor') == []: # see if there is a 'next' button
         last_page = True # if not, then it is the last page, the loop stops.
     else:
-        page += 1 # otherwise, go to next page.
+        p += 1 # otherwise, go to next page.
+        
+    # Take a random sleep after scrape 1 page, between 2 to 7 second
+    sleep=random.randint(2,7)
+    time.sleep(sleep)
+
 
 
 #part 2: scrap restaurant details
