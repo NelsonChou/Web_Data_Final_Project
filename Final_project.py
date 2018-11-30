@@ -5,6 +5,11 @@ import urllib
 import bs4 as bs
 from bs4 import SoupStrainer
 from bs4 import BeautifulSoup
+from bs4 import SoupStrainer
+import random
+import time
+from urllib.request import FancyURLopener  # This is library that helps us create the headless browser
+from random import choice #This library helps pick a random item from a list
 import os
 os.chdir('D:\\Master Program\\03. Begin\\Course\\09. Web Data Analytics\\Project')
 
@@ -14,17 +19,10 @@ reviewer_list=[]
 reviews_list=[]
 reviews_date_list=[]
 business_info_yesno_list=[]
+col_restaurant_info=['Restaurant name','Address','Business info','Yes/No','Review counts','Price range']
+df_restaurant_info=pd.DataFrame(columns=col_restaurant_info)
 
 #part 1: scrap all restaurant link: Lotto
-import pandas as pd
-import urllib
-import bs4 as bs
-from bs4 import SoupStrainer
-import random
-import time
-from urllib.request import FancyURLopener  # This is library that helps us create the headless browser
-from random import choice #This library helps pick a random item from a list
-
 user_agents = [
     'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36',
     'Opera/9.80 (X11; Linux i686; Ubuntu/14.10) Presto/2.12.388 Version/12.16',
