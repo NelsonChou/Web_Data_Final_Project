@@ -19,16 +19,16 @@ link_df = pd.read_csv(path+'\\'+file_name,delimiter= ',')
 link_df.head()
 range(len(link_df))
 
-RestNames=[]
-RestLinks=[]
-RestAddress=[]
-RevCount=[]
-business_info_yesno_list=[]
-business_info_all=[]
-RestPrice =[]
 df_restaurant_info = pd.DataFrame()
 
 for i in range(len(link_df)):
+    RestNames=[]
+    RestLinks=[]
+    RestAddress=[]
+    RevCount=[]
+    business_info_yesno_list=[]
+    business_info_all=[]
+    RestPrice =[]
     Price_Not_Found='F'
     user_agents = [
         'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36',
@@ -87,11 +87,17 @@ for i in range(len(link_df)):
 
 
     #get business info: only need to get once from the main page
-    if Price_Not_Found=='F':
-        business_info=soup.find_all('dt', class_='attribute-key')[2:]
-
-    elif Price_Not_Found=='T':
-        business_info=soup.find_all('dt', class_='attribute-key')[1:]
+    business_info=soup.find_all('dt', class_='attribute-key')
+    if(business_info[0].getText()) == 'Today':
+        if Price_Not_Found=='F':
+            business_info=soup.find_all('dt', class_='attribute-key')[2:]
+        elif Price_Not_Found=='T':
+            business_info=soup.find_all('dt', class_='attribute-key')[1:]
+    else:
+        if Price_Not_Found=='F':
+            business_info=soup.find_all('dt', class_='attribute-key')[1:]
+        elif Price_Not_Found=='T':
+            business_info=soup.find_all('dt', class_='attribute-key')[0:]
     
     for i in range(len(business_info)):
         business_info_clean=business_info[i].getText()
