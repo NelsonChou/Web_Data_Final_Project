@@ -82,19 +82,6 @@ for i in range(0,1):
 #             votes_sum=sum(votelist)    
 #             print(votes_sum)
 
-            #star_rating = int(soup.find('div', class_="i-stars i-stars--regular-5 rating-large").get('title')[:1])
-
-    #         index_final=0    
-    #         while html[index_final:].find('<div class="biz-rating biz-rating-large clearfix">')!=-1:
-    #             index1=html[index_final:].find('<div class="biz-rating biz-rating-large clearfix">')
-    #             index_final+=index1
-    #             index2=html[index_final:].find('title')
-    #             index_final+=index2
-    #             index3=html[index_final:].find('star rating')
-    #             star_rating=html[index_final:][7:index3]
-    #             #reviewer_rating_list.append(html_restaurant[index_final:][7:index3])
-    #             print(star_rating)
-
     #         #Elite user info: 
     #         index_final=0
 
@@ -113,4 +100,46 @@ for i in range(0,1):
             # Take a random sleep after scrape 1 page, between 2 to 7 second
             sleep=random.randint(2,7)
             time.sleep(sleep)
+    
+    #Get user rating and later combine with the restaurant review dataframe
+    page_num=0
+    
+    url=link_df['RestLinks'].iloc[0]+'?start='+str(page_num)
+    html=urllib.request.urlopen(url).read().decode('utf-8')
+    soup=bs.BeautifulSoup(html)
+    
+    current_page=int(soup.find_all('div', class_='page-of-pages arrange_unit arrange_unit--fill')[0].getText().strip().split(' ')[1])
+    total_page=int(soup.find_all('div', class_='page-of-pages arrange_unit arrange_unit--fill')[0].getText().strip().split(' ')[3])
+    
+    reviewer_rating_list=[]
+    
+    while current_page<=total_page:
+        #review rating on user level (the stars):
+        index_final=0
+        page_num+=20
+        
+        while html[index_final:].find('<div class="biz-rating biz-rating-large clearfix">')!=-1:
+            index1=html[index_final:].find('<div class="biz-rating biz-rating-large clearfix">')
+            index_final+=index1
+            index2=html[index_final:].find('title')
+            index_final+=index2
+            index3=html[index_final:].find('star rating')
+            reviewer_rating_list.append(html[index_final:][7:index3])
+            index_final+=index3
+    
+        url=link_df['RestLinks'].iloc[i]+'?start='+str(page_num)
+        html=urllib.request.urlopen(url).read().decode('utf-8')
+        soup=bs.BeautifulSoup(html)
+        
+        current_page=int(soup.find_all('div', class_='page-of-pages arrange_unit arrange_unit--fill')[0].getText().strip().split(' ')[1])
+        total_page=int(soup.find_all('div', class_='page-of-pages arrange_unit arrange_unit--fill')[0].getText().strip().split(' ')[3])
+        
+        sleep=random.randint(2,7)
+        time.sleep(sleep)
+
+col=['Rating']
+df_reviewer_rating=pd.DataFrame(reviewer_rating_list, columns=col)
+    
+df_reviewer_info=pd.concat(['df_reviewer_info', 'df_reviewer_rating', axis=1])
+    
         
