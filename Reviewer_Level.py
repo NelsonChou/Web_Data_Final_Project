@@ -104,7 +104,7 @@ for i in range(0,1):
     #Get user rating and later combine with the restaurant review dataframe
     page_num=0
     
-    url=link_df['RestLinks'].iloc[0]+'?start='+str(page_num)
+    url=link_df['RestLinks'].iloc[i]+'?start='+str(page_num)
     html=urllib.request.urlopen(url).read().decode('utf-8')
     soup=bs.BeautifulSoup(html)
     
