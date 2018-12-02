@@ -97,7 +97,7 @@ for i in range(0,1):
 reviewer_rating_list=[]
     
 for i in range(0,1):
-    
+    print('Restaurant: ',i)
     page_num1=0
     
     url1=link_df['RestLinks'].iloc[i][:-12]+'?start='+str(page_num1)
