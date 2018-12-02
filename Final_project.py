@@ -94,6 +94,8 @@ for i in range(0,1):
             #time.sleep(sleep)
     
     #Get user rating and later combine with the restaurant review dataframe
+reviewer_rating_list=[]
+    
 for i in range(0,1):
     
     page_num1=0
@@ -104,8 +106,6 @@ for i in range(0,1):
     
     current_page1=int(soup1.find_all('div', class_='page-of-pages arrange_unit arrange_unit--fill')[0].getText().strip().split(' ')[1])
     total_page1=int(soup1.find_all('div', class_='page-of-pages arrange_unit arrange_unit--fill')[0].getText().strip().split(' ')[3])
-    
-    reviewer_rating_list=[]
     
     while current_page1<=total_page1:
         #review rating on user level (the stars):
