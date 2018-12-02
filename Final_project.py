@@ -63,7 +63,7 @@ for i in range(0,1):
         for j in range(len(reviewers)):
 
             #get Restaurant name 
-            restaurant_name = link_df['RestNames'][i]
+            restaurant_name = link_df['RestNames'].iloc[i]
             print(restaurant_name)
 
             #get other reviewer details
